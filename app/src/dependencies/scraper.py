@@ -1,6 +1,6 @@
 from fastapi import Request
 
-from src.config.scraper import WebsiteType
+from src.types.scraper import WebsiteType
 from src.services.scraper import ScaperService
 from src.services.booking_dot_com import BookingDotComService
 from src.services.trip_advisor import TripAdvisorService

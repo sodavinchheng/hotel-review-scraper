@@ -15,7 +15,7 @@ help:
 # Development environment
 dev:
 	docker-compose up --build -d
-	docker-compose exec backend alembic upgrade head
+	docker-compose exec app alembic upgrade head
 
 # Production environment
 prod:
@@ -51,25 +51,14 @@ clean:
 
 db-makemigration:
 	@read -p "Enter migration message: " message; \
-	docker-compose exec backend alembic revision --autogenerate -m "$$message"
+	docker-compose exec app alembic revision --autogenerate -m "$$message"
 
 db-migrate:
-	docker-compose exec backend alembic upgrade head
+	docker-compose exec app alembic upgrade head
 
 db-reset:
-	docker-compose exec backend alembic downgrade base
-	docker-compose exec backend alembic upgrade head
+	docker-compose exec app alembic downgrade base
+	docker-compose exec app alembic upgrade head
 
-# Install dependencies
-install-frontend:
-	cd frontend && npm install
-
-install-backend:
-	cd backend && pip install -r requirements.txt
-
-openapi:
-	docker-compose exec frontend npm run openapi:docker
-
-# Formatting
-format:
-	docker-compose exec frontend npx lint-staged --verbose
+install-app:
+	cd app && pip install -r requirements.txt

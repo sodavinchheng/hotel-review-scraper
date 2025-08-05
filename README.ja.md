@@ -4,7 +4,7 @@
 
 # フルスタックアプリケーション
 
-React フロントエンドと Python FastAPI バックエンドを持つモダンなフルスタックアプリケーションで、Docker でコンテナ化されています。
+Python FastAPI バックエンドを持つモダンなアプリケーションで、Docker でコンテナ化されています。
 
 ## 前提条件
 
@@ -21,31 +21,7 @@ react-fastapi-template/
 ├── Makefile                    # 便利なコマンド
 ├── README.md                   # このファイルの英語版
 ├── README.ja.md                # このファイル
-├── frontend/                   # Reactアプリケーション
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   ├── package.json
-│   ├── public/
-│   └── src/
-│       ├── assets              # 画像、アイコンなど
-│       ├── components          # UIコンポーネント
-│       │   ├── atoms           # 基本的な再利用可能コンポーネント
-│       │   ├── molecules       # 二次的な再利用可能コンポーネント
-│       │   ├── organisms       # 再利用可能コンポーネントブロック
-│       │   ├── pages           # ページビューコンポーネント
-│       │   └── ui              # ShadCN uiを使用してインストールされたコンポーネント
-│       ├── constants           # 設定値
-│       ├── contexts            # 依存関係
-│       ├── core
-│       │   ├── api             # OpenAPIクラス定義（詳細はOpenAPIセクションを参照）
-│       │   └── http            # OpenAPI接続クライアント
-│       ├── hooks               # 再利用可能フック
-│       ├── lib                 # ShadCN uiによってインストールされたTailwindcss関数
-│       ├── services            # 外部サービスゲートウェイ関数
-│       ├── types               # アプリケーションドメインタイプ定義
-│       ├── utils               # 共通ユーティリティ関数
-│       └── App.tsx
-└── backend/                    # Python FastAPIアプリケーション
+└── app/                    # Python FastAPIアプリケーション
     ├── Dockerfile
     ├── requirements.txt
     ├── main.py
@@ -90,7 +66,7 @@ cp .env.sample .env
 ```bash
 python3 -m venv venv
 source ./venv/bin/activate
-pip install -r ./backend/requirements.txt
+pip install -r ./app/requirements.txt
 ```
 
 Make を使用（推奨）：
@@ -103,13 +79,12 @@ make dev
 
 ```bash
 docker-compose up --build -d
-docker-compose exec backend alembic upgrade head
+docker-compose exec app alembic upgrade head
 ```
 
 ### 4. アプリケーションへのアクセス
 
-- **フロントエンド**: http://localhost:5173
-- **バックエンド API**: http://localhost:8000/api
+- **REST API**: http://localhost:8000/api
 - **API ドキュメント**: （詳細は OpenAPI セクションを参照）
   - _Swagger_: http://localhost:8000/docs
   - _Redoc_: http://localhost:8000/redoc
@@ -118,24 +93,6 @@ docker-compose exec backend alembic upgrade head
 ## OpenAPI
 
 FastAPI は自動的に`openapi.json`ファイルを生成し、Swagger UI で表示できます。
-
-フロントエンドアプリケーションは`openapi-generator-cli`を使用して API 定義の TypeScript クラスを生成します。API 実装と API 定義クラスを同期するために以下のコマンドを実行してください。
-
-```bash
-make openapi
-```
-
-または Make を使用したくない場合：
-
-```bash
-docker-compose exec frontend npm run openapi:docker
-```
-
-またはローカルでコマンドを実行したい場合：
-
-```bash
-npm run openapi
-```
 
 ## 利用可能なコマンド
 
@@ -175,42 +132,32 @@ docker-compose down
 docker-compose logs -f
 
 # 特定のサービスの再ビルド
-docker-compose build frontend
-docker-compose build backend
+docker-compose build app
 
 # コンテナ内でコマンドを実行
-docker-compose exec backend python manage.py migrate
-docker-compose exec frontend npm test
+docker-compose exec app python manage.py migrate
 ```
 
 ## 開発ワークフロー
 
 ### ホットリロード
 
-フロントエンドとバックエンドの両方が開発中のホットリロードをサポートしています：
+バックエンドが開発中のホットリロードをサポートしています：
 
-- **フロントエンド**: React 開発サーバーがファイル変更時に自動的にリロード
-- **バックエンド**: FastAPI が`--reload`フラグで Python ファイル変更時に再起動
+- FastAPI が`--reload`フラグで Python ファイル変更時に再起動
 
 ### 変更の実行
 
-1. `frontend/`または`backend/`ディレクトリのファイルを編集
+1. `app/`ディレクトリのファイルを編集
 2. 変更は実行中のコンテナに自動的に反映
 3. データベースの変更は`postgres_data`ボリュームに保持
 
 ### 依存関係の追加
 
-**フロントエンド（React）:**
+**FastAPI（Python）:**
 
 ```bash
-cd frontend
-npm install <package-name>
-```
-
-**バックエンド（Python）:**
-
-```bash
-cd backend
+cd app
 pip install <package-name>
 echo "<package-name>==<version>" >> requirements.txt
 ```
@@ -227,11 +174,7 @@ make build
 
 アプリケーションは開発用にこれらのデフォルト環境変数を使用します：
 
-**フロントエンド:**
-
-- `VITE_API_URL=http://localhost:8000`
-
-**バックエンド:**
+**FastAPI:**
 
 - `DATABASE_URL=postgresql://user:password@db:5432/appdb`
 - `CORS_ORIGINS=http://localhost:5173`
@@ -248,7 +191,6 @@ make build
 
 ```yaml
 environment:
-  - REACT_APP_API_URL=https://api.yourdomain.com
   - DATABASE_URL=postgresql://user:secure_password@db:5432/appdb
   - CORS_ORIGINS=https://yourdomain.com
   - POSTGRES_PASSWORD=your_secure_password_here
@@ -279,8 +221,7 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 
 ### 3. 本番機能
 
-- **フロントエンド**: gzip 圧縮とセキュリティヘッダー付きの Nginx で配信
-- **バックエンド**: パフォーマンス向上のため複数ワーカーで Gunicorn を使用
+- **FastAPI**: パフォーマンス向上のため複数ワーカーで Gunicorn を使用
 - **データベース**: 安全な認証情報で永続ストレージ
 - **セキュリティ**: 非 root ユーザー、ヘルスチェック、適切な CORS 設定
 
@@ -344,8 +285,7 @@ make build
 make logs
 
 # 特定のサービス
-docker-compose logs -f frontend
-docker-compose logs -f backend
+docker-compose logs -f app
 docker-compose logs -f db
 ```
 
@@ -366,7 +306,7 @@ make clean
 
 ## 開発のヒント
 
-1. **コード変更**: フロントエンドとバックエンドの両方でホットリロードをサポート
+1. **コード変更**: FastAPIがホットリロードをサポート
 2. **データベースデータ**: `postgres_data`ボリュームでコンテナ再起動間で保持
 3. **ログ**: `make logs`ですべてのサービスを監視
 4. **テスト**: `docker-compose exec`でコンテナ内でテストを実行
