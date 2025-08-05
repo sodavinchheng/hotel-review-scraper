@@ -10,3 +10,6 @@ passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
 httpx==0.28.1
 starlette==0.46.2
+beautifulsoup4==4.13.4
+selenium==4.34.2
+webdriver-manager==4.0.2
