@@ -1,6 +1,6 @@
 > **[日本語版はこちら / Japanese version here](README.ja.md)**
 
-# Full Stack Application
+# Hotel Review Scraper
 
 A modern Python FastAPI application, containerized with Docker.
 

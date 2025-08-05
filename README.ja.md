@@ -2,7 +2,7 @@
 > この文書は AI によって英語版から翻訳されました。翻訳の精度については保証できませんので、重要な情報については[英語版](README.md)をご確認ください。  
 > _This document has been translated from English by AI. Translation accuracy cannot be guaranteed, so please refer to the [English version](README.md) for critical information._
 
-# フルスタックアプリケーション
+# ホテルレビュースクレイパー
 
 Python FastAPI バックエンドを持つモダンなアプリケーションで、Docker でコンテナ化されています。
 
